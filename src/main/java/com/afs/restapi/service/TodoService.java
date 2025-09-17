@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -67,14 +68,15 @@ public class TodoService {
 
     @Tool(description = "update Multiple todos by ids. Should set id, if not call findAll first.")
     public List<Todo> updateMultipleByIds(List<Todo> newTodos) {
-        List<Todo> updatedTodos = new ArrayList<>();
-        for (Todo todo: newTodos){
-            if (todo.getId() == null || !todoRepository.existsById(todo.getId())) {
-                throw new TodoNotFoundException(todo.getId());
-            }
-            updateById(todo.getId(), todo);
-            updatedTodos.add(todoRepository.findById(todo.getId()).get());
-        }
-        return updatedTodos;
+        return newTodos.stream()
+                .map(todo -> {
+                    if (todo.getId() == null || !todoRepository.existsById(todo.getId())) {
+                        throw new TodoNotFoundException(todo.getId());
+                    }
+                    updateById(todo.getId(), todo);
+                    return todoRepository.findById(todo.getId()).get();
+                })
+                .collect(Collectors.toList());
     }
+
 }
