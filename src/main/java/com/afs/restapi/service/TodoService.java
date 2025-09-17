@@ -48,4 +48,9 @@ public class TodoService {
         }
         todoRepository.deleteById(id);
     }
+
+    @Tool(description = "create Multiple todos,cannot set id, if set id, will be failed")
+    public List<Todo> createMultiple(List<Todo> todos) {
+        return todoRepository.saveAll(todos);
+    }
 }
